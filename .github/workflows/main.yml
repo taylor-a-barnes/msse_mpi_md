@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test MPI-Parallelized MD Code
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build the code
+        run: |
+          sudo apt-get install -y cmake g++ mpich
+
+      - name: Build the code
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+
+      - name: Run the code on a single rank
+        run: |
+          cd build
+          mpiexec -n 1 ./mpimd
+
+      - name: Run the code on three ranks
+        run: |
+          cd build
+          mpiexec -n 3 ./mpimd
+
+      - name: Run the code on four ranks
+        run: |
+          cd build
+          mpiexec -n 4 ./mpimd
+
